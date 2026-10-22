@@ -1,0 +1,80 @@
+﻿@model IEnumerable<Habitacion>
+
+@{
+    ViewData["Title"] = "Disponibilidad";
+
+    var ingreso = (DateOnly?)ViewBag.Ingreso;
+    var salida = (DateOnly?)ViewBag.Salida;
+    int noches = ViewBag.Noches;
+    bool buscado = ViewBag.Buscado;
+}
+
+<h1>Disponibilidad de habitaciones</h1>
+
+<form method="get" asp-action="Disponibles" class="row g-3 mb-4">
+    <div class="col-auto">
+        <label for="ingreso" class="form-label">Fecha de ingreso</label>
+        <input type="date" id="ingreso" name="ingreso" class="form-control"
+               value="@(ingreso?.ToString("yyyy-MM-dd"))" />
+    </div>
+    <div class="col-auto">
+        <label for="salida" class="form-label">Fecha de salida</label>
+        <input type="date" id="salida" name="salida" class="form-control"
+               value="@(salida?.ToString("yyyy-MM-dd"))" />
+    </div>
+    <div class="col-auto d-flex align-items-end">
+        <button type="submit" class="btn btn-primary">Buscar</button>
+    </div>
+</form>
+
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger">@ViewBag.Error</div>
+}
+
+@if (buscado)
+{
+    <p class="text-muted">
+        Del @ingreso!.Value.ToString("dd/MM/yyyy") al @salida!.Value.ToString("dd/MM/yyyy"):
+        @noches noche(s).
+    </p>
+
+    @if (Model.Any())
+    {
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th>Número</th>
+                    <th>Piso</th>
+                    <th>Tipo</th>
+                    <th>Capacidad</th>
+                    <th>Precio por noche</th>
+                    <th>Noches</th>
+                    <th>Total estimado</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.Numero</td>
+                        <td>@item.Piso</td>
+                        <td>@item.IdTipoHabitacionNavigation.Nombre</td>
+                        <td>@item.IdTipoHabitacionNavigation.Capacidad</td>
+                        <td>S/ @item.IdTipoHabitacionNavigation.PrecioNoche.ToString("N2")</td>
+                        <td>@noches</td>
+                        <td>S/ @((item.IdTipoHabitacionNavigation.PrecioNoche * noches).ToString("N2"))</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div class="alert alert-warning">No hay habitaciones libres en ese rango de fechas. Prueba con otras fechas.</div>
+    }
+}
+else if (ViewBag.Error == null)
+{
+    <p class="text-muted">Elige las fechas de ingreso y salida para ver las habitaciones libres.</p>
+}

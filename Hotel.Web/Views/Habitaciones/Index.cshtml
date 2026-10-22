@@ -1,0 +1,68 @@
+﻿@model IEnumerable<Habitacion>
+
+@{
+    ViewData["Title"] = "Habitaciones";
+}
+
+<h1>Habitaciones</h1>
+
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success">@TempData["Mensaje"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Nueva habitación</a>
+</p>
+
+<form method="get" asp-action="Index" class="row g-2 mb-3">
+    <div class="col-auto">
+        <select name="idTipo" class="form-select" asp-items="ViewBag.Tipos">
+            <option value="">-- Todos los tipos --</option>
+        </select>
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-secondary">Filtrar</button>
+        <a asp-action="Index" class="btn btn-outline-secondary">Limpiar</a>
+    </div>
+</form>
+
+<table class="table table-striped align-middle">
+    <thead>
+        <tr>
+            <th>Número</th>
+            <th>Piso</th>
+            <th>Tipo</th>
+            <th>Capacidad</th>
+            <th>Precio por noche</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Numero</td>
+                <td>@item.Piso</td>
+                <td>@item.IdTipoHabitacionNavigation.Nombre</td>
+                <td>@item.IdTipoHabitacionNavigation.Capacidad</td>
+                <td>S/ @item.IdTipoHabitacionNavigation.PrecioNoche.ToString("N2")</td>
+                <td class="text-end">
+                    <a asp-action="Details" asp-route-id="@item.IdHabitacion" class="btn btn-sm btn-outline-secondary">Detalles</a>
+                    <a asp-action="Edit" asp-route-id="@item.IdHabitacion" class="btn btn-sm btn-outline-primary">Editar</a>
+                    <a asp-action="Delete" asp-route-id="@item.IdHabitacion" class="btn btn-sm btn-outline-danger">Eliminar</a>
+                </td>
+            </tr>
+        }
+        @if (!Model.Any())
+        {
+            <tr>
+                <td colspan="6" class="text-center text-muted">No hay habitaciones para mostrar.</td>
+            </tr>
+        }
+    </tbody>
+</table>

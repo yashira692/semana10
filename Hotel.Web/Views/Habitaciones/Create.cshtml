@@ -1,0 +1,42 @@
+﻿@model Habitacion
+
+@{
+    ViewData["Title"] = "Nueva habitación";
+}
+
+<h1>Nueva habitación</h1>
+
+<div class="row">
+    <div class="col-md-5">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="mb-3">
+                <label asp-for="Numero" class="form-label">Número</label>
+                <input asp-for="Numero" class="form-control" />
+                <span asp-validation-for="Numero" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Piso" class="form-label">Piso</label>
+                <input asp-for="Piso" type="number" class="form-control" />
+                <span asp-validation-for="Piso" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="IdTipoHabitacion" class="form-label">Tipo de habitación</label>
+                <select asp-for="IdTipoHabitacion" class="form-select" asp-items="ViewBag.Tipos">
+                    <option value="">-- Seleccione --</option>
+                </select>
+                <span asp-validation-for="IdTipoHabitacion" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Guardar</button>
+            <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

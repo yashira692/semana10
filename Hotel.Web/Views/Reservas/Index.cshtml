@@ -1,0 +1,73 @@
+﻿@model IEnumerable<Reserva>
+
+@{
+    ViewData["Title"] = "Reservas";
+}
+
+<h1>Reservas</h1>
+
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success">@TempData["Mensaje"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Nueva reserva</a>
+    <a asp-action="Disponibles" class="btn btn-outline-secondary">Ver disponibilidad</a>
+</p>
+
+<table class="table table-striped align-middle">
+    <thead>
+        <tr>
+            <th>Huésped</th>
+            <th>Habitación</th>
+            <th>Ingreso</th>
+            <th>Salida</th>
+            <th>Estado</th>
+            <th>Total</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            var noches = item.FechaSalida.DayNumber - item.FechaIngreso.DayNumber;
+            var total = noches * item.IdHabitacionNavigation.IdTipoHabitacionNavigation.PrecioNoche;
+            var clase = item.Estado switch
+            {
+                "Confirmada" => "bg-success",
+                "Pendiente" => "bg-warning text-dark",
+                "Cancelada" => "bg-danger",
+                _ => "bg-secondary"
+            };
+
+            <tr>
+                <td>@item.IdHuespedNavigation.Apellidos, @item.IdHuespedNavigation.Nombres</td>
+                <td>@item.IdHabitacionNavigation.Numero</td>
+                <td>@item.FechaIngreso.ToString("dd/MM/yyyy")</td>
+                <td>@item.FechaSalida.ToString("dd/MM/yyyy")</td>
+                <td><span class="badge @clase">@item.Estado</span></td>
+                <td>S/ @total.ToString("N2")</td>
+                <td class="text-end">
+                    @if (item.Estado == "Pendiente" || item.Estado == "Confirmada")
+                    {
+                        <form asp-action="Cancelar" asp-route-id="@item.IdReserva" method="post" class="d-inline"
+                              onsubmit="return confirm('¿Seguro que quieres cancelar esta reserva?');">
+                            <button type="submit" class="btn btn-sm btn-outline-danger">Cancelar</button>
+                        </form>
+                    }
+                </td>
+            </tr>
+        }
+        @if (!Model.Any())
+        {
+            <tr>
+                <td colspan="7" class="text-center text-muted">Todavía no hay reservas registradas.</td>
+            </tr>
+        }
+    </tbody>
+</table>
